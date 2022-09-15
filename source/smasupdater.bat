@@ -12,7 +12,7 @@ setlocal enableDelayedExpansion
 set /a size=80-1 & rem screen size minus one
 
 ::With that out of the way, we can start
-title Super Mario All-Stars++ Updater ^(v1.2.0^)
+title Super Mario All-Stars++ Updater ^(v1.5.0^)
 echo Starting updater...
 ::This makes sure we go into the root of the .bat, preventing errors
 pushd "%~dp0"
@@ -28,6 +28,9 @@ if /i !ERRORLEVEL!==0 (
 	pause
 	exit
 )
+
+if not exist smassav_backup ( mkdir smassav_backup )
+
 ::We then start the menu.
 :start
 cls
@@ -39,16 +42,83 @@ echo folder is in the worlds folder ^(Located under data^/worlds^, or
 echo just worlds^) before downloading^/updating^^!^^!^^!^^!^^!
 echo.
 echo Press 1 and enter to download^/update Super Mario All^-Stars^+^+.
-echo Press 2 and enter to exit.
+echo Press 2 and enter to download^/update the LunaLua SEE Mod.
+echo Press 3 and enter for some settings.
+echo Press 4 and enter to exit.
 ::These are choices set to launch certain parts of the .bat.
 set choice=
 set /p choice=
 if not '%choice%'=='' set choice=%choice:~0,1%
 if '%choice%'=='1' goto prechecksmas
 if '%choice%'=='2' goto prechecksee
-if '%choice%'=='3' goto exit
+if '%choice%'=='3' goto settingsmenu
+if '%choice%'=='4' goto exit
 echo "%choice%" is not valid, try again.
 goto start
+
+::Here's the settings menu.
+:settingsmenu
+cls
+echo SETTINGS
+echo Go here for some file management settings. These are here for if there are any
+echo downloading issues, or anything else at all.
+echo.
+echo Press 1 and enter to refresh SMAS^+^+ ^(Saves will be kept^).
+echo Press 2 and enter to delete SMAS^+^+ for redownloading ^(Saves will be kept^).
+echo Press 3 and enter to move any backup saves back to SMAS^+^+.
+echo Press 4 and enter to return back to the main menu.
+::These are choices set to launch certain parts of the .bat.
+set choice=
+set /p choice=
+if not '%choice%'=='' set choice=%choice:~0,1%
+if '%choice%'=='1' goto clearsmas
+if '%choice%'=='2' goto clearsmasandgit
+if '%choice%'=='3' goto movesavestosmas
+if '%choice%'=='4' goto start
+echo "%choice%" is not valid, try again.
+goto start
+
+:movesavestosmas
+cls
+
+echo Moving saves...
+@timeout 0 /nobreak>nul
+for /r "%cd%\smassav_backup" %x in (*.sav) do move "%x" "%cd%\data\worlds\Super Mario All-Stars++"
+echo Done^^! Returning to the menu in 5 seconds...
+@timeout 5 /nobreak>nul
+goto settingsmenu
+
+:clearsmas
+::We will now move saves out to it's own folder.
+cls
+echo Moving saves...
+@timeout 0 /nobreak>nul
+for /r "%cd%\data\worlds\Super Mario All-Stars++" %x in (*.sav) do move "%x" "%cd%\smassav_backup"
+echo Refreshing game for regeneration...
+@timeout 0 /nobreak>nul
+Recycle.exe "data/worlds/Super Mario All-Stars++"
+@timeout 0 /nobreak>nul
+echo Done^^! Returning to the menu in 5 seconds... ^(You should find your saves in the
+echo ^"smassav_backup^" folder.^)
+@timeout 5 /nobreak>nul
+goto settingsmenu
+
+:clearsmasandgit
+::We will now move saves out to it's own folder.
+cls
+echo Moving saves...
+@timeout 0 /nobreak>nul
+mkdir smassav_backup 
+for /r "%cd%\data\worlds\Super Mario All-Stars++" %x in (*.sav) do move "%x" "%cd%\smassav_backup"
+echo Restarting state for redownloading...
+@timeout 0 /nobreak>nul
+Recycle.exe "data/worlds/Super Mario All-Stars++"
+Recycle.exe "data/worlds/.git"
+@timeout 0 /nobreak>nul
+echo Done^^! Returning to the menu in 5 seconds... ^(You should find your saves in the
+echo ^"smassav_backup^" folder.^)
+@timeout 5 /nobreak>nul
+goto settingsmenu
 
 ::Precheck checks to see if there's a .git folder which holds the latest update data. If one doesn't exist, it goes to the nogit part.
 :prechecksmas
