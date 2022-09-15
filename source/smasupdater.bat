@@ -31,12 +31,12 @@ if /i !ERRORLEVEL!==0 (
 ::We then start the menu.
 :start
 cls
-echo Super Mario All-Stars^+^+ Updater
-echo v1.2.0
+echo Super Mario All-Stars^+^+ Downloader^/Updater
+echo v1.5.0
 echo.
 echo Make SURE this .bat is in the SMBX2 folder^, and the ^"PortableGit^"
 echo folder is in the worlds folder ^(Located under data^/worlds^, or
-echo just worlds^) before downloading^/updating!^^!^^!^^!^^!
+echo just worlds^) before downloading^/updating^^!^^!^^!^^!^^!
 echo.
 echo Press 1 and enter to download^/update Super Mario All^-Stars^+^+.
 echo Press 2 and enter to exit.
@@ -44,24 +44,27 @@ echo Press 2 and enter to exit.
 set choice=
 set /p choice=
 if not '%choice%'=='' set choice=%choice:~0,1%
-if '%choice%'=='1' goto precheck
-if '%choice%'=='2' goto exit
+if '%choice%'=='1' goto prechecksmas
+if '%choice%'=='2' goto prechecksee
+if '%choice%'=='3' goto exit
 echo "%choice%" is not valid, try again.
 goto start
 
 ::Precheck checks to see if there's a .git folder which holds the latest update data. If one doesn't exist, it goes to the nogit part.
-:precheck
+:prechecksmas
 cls
 echo Checking for SMAS^+^+ updates...
 @timeout 0 /nobreak>nul
 cd data
 cd worlds
-if not exist .git ( goto nogit )
-if exist .git ( goto yesgit )
+if not exist .git ( goto nogitsmas )
+if exist .git ( goto yesgitsmas )
 
-:yesgit
+:yesgitsmas
 ::Now we start updating the episode if .git wasn't found.
 echo Pulling the latest update from GitHub...
+::Go to the worlds directory before doing anything else
+call PortableGit\bin\git.exe -C data/worlds
 ::This reads the .git for the repository that's saved
 call PortableGit\bin\git.exe fetch --all
 ::This resets to download a different branch if so
@@ -72,6 +75,8 @@ set GIT_TRACE=1
 set GIT_CURL_VERBOSE=1
 ::Downloads the specific branch from the repo that is stored
 call PortableGit\bin\git.exe pull origin main
+::Finally, reset back to the default folder
+call PortableGit\bin\git.exe -C ../..
 ::After downloading, there's a weird world map corruption issue when downloading from GitHub. Make sure to extract the .7z automatically from both worlds to prevent crashes and errors.
 cd "Super Mario All-Stars++"
 __7zip\7zG.exe x "__World Map.7z" -aoa
@@ -81,9 +86,11 @@ cd..
 ::The download is finally complete
 goto updatecomplete
 
-:nogit
+:nogitsmas
 ::Ping the Internet to start a connection
 PING -n 5 127.0.0.1>nul
+::Go to the worlds directory before doing anything else
+call PortableGit\bin\git.exe -C data/worlds
 ::Make a .git folder
 call PortableGit\bin\git.exe init
 ::Add the SMAS++ repo to the .git list
@@ -94,6 +101,8 @@ set GIT_TRACE=1
 set GIT_CURL_VERBOSE=1
 ::Downloads the specific branch from the repo that is stored
 call PortableGit\bin\git.exe pull origin main
+::Finally, reset back to the default folder
+call PortableGit\bin\git.exe -C ../..
 ::After downloading, there's a weird world map corruption issue when downloading from GitHub. Make sure to extract the .7z automatically from both worlds to prevent crashes and errors.
 cd "Super Mario All-Stars++"
 __7zip\7zG.exe x "__World Map.7z" -aoa
@@ -109,13 +118,17 @@ echo you can correct them by doing what is above.
 echo.
 echo If you want to run SMBX2.exe just press 1 and enter.
 echo If you don^'t want to^, just press 2 and enter ^(Or close the window^).
+echo If you want to restart the download again^, just press 3 and enter.
+echo If you want to restart the program^, press 4 and enter.
 set choice=
 set /p choice=
 if not '%choice%'=='' set choice=%choice:~0,1%
 if '%choice%'=='1' goto launchsmbx2
 if '%choice%'=='2' goto dontlaunchsmbx2
+if '%choice%'=='3' goto prechecksmas
+if '%choice%'=='4' goto start
 echo "%choice%" is not valid, try again.
-goto launchsmbx2
+goto updatecomplete
 
 :dontlaunchsmbx2
 cls
