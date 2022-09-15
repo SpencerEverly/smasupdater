@@ -42,17 +42,15 @@ echo folder is in the worlds folder ^(Located under data^/worlds^, or
 echo just worlds^) before downloading^/updating^^!^^!^^!^^!^^!
 echo.
 echo Press 1 and enter to download^/update Super Mario All^-Stars^+^+.
-echo Press 2 and enter to download^/update the LunaLua SEE Mod.
-echo Press 3 and enter for some settings.
-echo Press 4 and enter to exit.
+echo Press 2 and enter for some settings.
+echo Press 3 and enter to exit.
 ::These are choices set to launch certain parts of the .bat.
 set choice=
 set /p choice=
 if not '%choice%'=='' set choice=%choice:~0,1%
 if '%choice%'=='1' goto prechecksmas
-if '%choice%'=='2' goto prechecksee
-if '%choice%'=='3' goto settingsmenu
-if '%choice%'=='4' goto exit
+if '%choice%'=='2' goto settingsmenu
+if '%choice%'=='3' goto exit
 echo "%choice%" is not valid, try again.
 goto start
 
@@ -67,7 +65,6 @@ echo Press 1 and enter to refresh SMAS^+^+ ^(Saves will be kept^).
 echo Press 2 and enter to delete SMAS^+^+ for redownloading ^(Saves will be kept^).
 echo Press 3 and enter to move any backup saves back to SMAS^+^+.
 echo Press 4 and enter to return back to the main menu.
-::These are choices set to launch certain parts of the .bat.
 set choice=
 set /p choice=
 if not '%choice%'=='' set choice=%choice:~0,1%
@@ -82,8 +79,9 @@ goto start
 cls
 echo Moving saves...
 @timeout 0 /nobreak>nul
-if not exist "%cd%\data\worlds\Super Mario All-Stars++\save1.sav" then goto nosavesfound
+if not exist "%cd%\smassav_backup\save1.sav" then goto nosavesfound
 move /y "%cd%\smassav_backup\*.sav" "%cd%\data\worlds\Super Mario All-Stars++"
+move /y "%cd%\smassav_backup\*-ext.dat" "%cd%\data\worlds\Super Mario All-Stars++"
 echo Done^^! Returning to the menu in 5 seconds...
 @timeout 5 /nobreak>nul
 goto settingsmenu
@@ -188,7 +186,7 @@ cd..
 goto updatecomplete
 
 :updatecomplete
-echo Episode updated. Check above to see if there are any errors. If any,
+echo Download complete. Check above to see if there are any errors. If any,
 echo you can correct them by doing what is above.
 echo.
 echo If you want to run SMBX2.exe just press 1 and enter.
