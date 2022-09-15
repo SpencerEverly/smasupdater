@@ -83,6 +83,7 @@ cls
 
 echo Moving saves...
 @timeout 0 /nobreak>nul
+for /r "%cd%\data\worlds\Super Mario All-Stars++" %x in (*.sav) do if not exist "%x" then goto nosavesfound
 for /r "%cd%\smassav_backup" %x in (*.sav) do move "%x" "%cd%\data\worlds\Super Mario All-Stars++"
 echo Done^^! Returning to the menu in 5 seconds...
 @timeout 5 /nobreak>nul
@@ -93,10 +94,11 @@ goto settingsmenu
 cls
 echo Moving saves...
 @timeout 0 /nobreak>nul
-for /r "%cd%\data\worlds\Super Mario All-Stars++" %x in (*.sav) do move "%x" "%cd%\smassav_backup"
+for /r "%cd%\data\worlds\Super Mario All-Stars++" %x in (*.sav) do if exist "%x" then copy "%x" "%cd%\smassav_backup"
+for /r "%cd%\data\worlds\Super Mario All-Stars++" %x in (*-ext.dat) do if exist "%x" then copy "%x" "%cd%\smassav_backup"
 echo Refreshing game for regeneration...
 @timeout 0 /nobreak>nul
-Recycle.exe "data/worlds/Super Mario All-Stars++"
+call Recycle.exe "data/worlds/Super Mario All-Stars++"
 @timeout 0 /nobreak>nul
 echo Done^^! Returning to the menu in 5 seconds... ^(You should find your saves in the
 echo ^"smassav_backup^" folder.^)
@@ -109,14 +111,20 @@ cls
 echo Moving saves...
 @timeout 0 /nobreak>nul
 mkdir smassav_backup 
-for /r "%cd%\data\worlds\Super Mario All-Stars++" %x in (*.sav) do move "%x" "%cd%\smassav_backup"
+for /r "%cd%\data\worlds\Super Mario All-Stars++" %x in (*.sav) do if exist "%x" then copy "%x" "%cd%\smassav_backup"
+for /r "%cd%\data\worlds\Super Mario All-Stars++" %x in (*-ext.dat) do if exist "%x" then copy "%x" "%cd%\smassav_backup"
 echo Restarting state for redownloading...
 @timeout 0 /nobreak>nul
-Recycle.exe "data/worlds/Super Mario All-Stars++"
-Recycle.exe "data/worlds/.git"
+call Recycle.exe "data/worlds/Super Mario All-Stars++"
+call Recycle.exe "data/worlds/.git"
 @timeout 0 /nobreak>nul
 echo Done^^! Returning to the menu in 5 seconds... ^(You should find your saves in the
 echo ^"smassav_backup^" folder.^)
+@timeout 5 /nobreak>nul
+goto settingsmenu
+
+:nosavesfound
+echo No saves found^^! Returning to the menu in 5 seconds...
 @timeout 5 /nobreak>nul
 goto settingsmenu
 
