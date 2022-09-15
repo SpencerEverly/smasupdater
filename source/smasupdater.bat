@@ -80,11 +80,10 @@ goto start
 
 :movesavestosmas
 cls
-
 echo Moving saves...
 @timeout 0 /nobreak>nul
-for /r "%cd%\data\worlds\Super Mario All-Stars++" %x in (*.sav) do if not exist "%x" then goto nosavesfound
-for /r "%cd%\smassav_backup" %x in (*.sav) do move "%x" "%cd%\data\worlds\Super Mario All-Stars++"
+if not exist "%cd%\data\worlds\Super Mario All-Stars++\save1.sav" then goto nosavesfound
+move /y "%cd%\smassav_backup\*.sav" "%cd%\data\worlds\Super Mario All-Stars++"
 echo Done^^! Returning to the menu in 5 seconds...
 @timeout 5 /nobreak>nul
 goto settingsmenu
@@ -94,8 +93,8 @@ goto settingsmenu
 cls
 echo Moving saves...
 @timeout 0 /nobreak>nul
-for /r "%cd%\data\worlds\Super Mario All-Stars++" %x in (*.sav) do if exist "%x" then copy "%x" "%cd%\smassav_backup"
-for /r "%cd%\data\worlds\Super Mario All-Stars++" %x in (*-ext.dat) do if exist "%x" then copy "%x" "%cd%\smassav_backup"
+move /y "%cd%\data\worlds\Super Mario All-Stars++\*.sav" "%cd%\smassav_backup"
+move /y "%cd%\data\worlds\Super Mario All-Stars++\*-ext.dat" "%cd%\smassav_backup"
 echo Refreshing game for regeneration...
 @timeout 0 /nobreak>nul
 call Recycle.exe "data/worlds/Super Mario All-Stars++"
@@ -111,8 +110,8 @@ cls
 echo Moving saves...
 @timeout 0 /nobreak>nul
 mkdir smassav_backup 
-for /r "%cd%\data\worlds\Super Mario All-Stars++" %x in (*.sav) do if exist "%x" then copy "%x" "%cd%\smassav_backup"
-for /r "%cd%\data\worlds\Super Mario All-Stars++" %x in (*-ext.dat) do if exist "%x" then copy "%x" "%cd%\smassav_backup"
+move /y "%cd%\data\worlds\Super Mario All-Stars++\*.sav" "%cd%\smassav_backup"
+move /y "%cd%\data\worlds\Super Mario All-Stars++\*-ext.dat" "%cd%\smassav_backup"
 echo Restarting state for redownloading...
 @timeout 0 /nobreak>nul
 call Recycle.exe "data/worlds/Super Mario All-Stars++"
@@ -139,23 +138,22 @@ if not exist .git ( goto nogitsmas )
 if exist .git ( goto yesgitsmas )
 
 :yesgitsmas
+cd ../..
 ::Now we start updating the episode if .git wasn't found.
 echo Pulling the latest update from GitHub...
-::Go to the worlds directory before doing anything else
-call PortableGit\bin\git.exe -C data/worlds
 ::This reads the .git for the repository that's saved
-call PortableGit\bin\git.exe fetch --all
+call PortableGit\bin\git.exe -C data/worlds fetch --all
 ::This resets to download a different branch if so
-call PortableGit\bin\git.exe reset --hard
+call PortableGit\bin\git.exe -C data/worlds reset --hard
 ::The set stuff improves the connection when downloading the repo
 set GIT_TRACE_PACKET=1
 set GIT_TRACE=1
 set GIT_CURL_VERBOSE=1
 ::Downloads the specific branch from the repo that is stored
-call PortableGit\bin\git.exe pull origin main
-::Finally, reset back to the default folder
-call PortableGit\bin\git.exe -C ../..
+call PortableGit\bin\git.exe -C data/worlds pull origin main
 ::After downloading, there's a weird world map corruption issue when downloading from GitHub. Make sure to extract the .7z automatically from both worlds to prevent crashes and errors.
+cd data
+cd worlds
 cd "Super Mario All-Stars++"
 __7zip\7zG.exe x "__World Map.7z" -aoa
 cd..
@@ -165,23 +163,22 @@ cd..
 goto updatecomplete
 
 :nogitsmas
+cd ../..
 ::Ping the Internet to start a connection
 PING -n 5 127.0.0.1>nul
-::Go to the worlds directory before doing anything else
-call PortableGit\bin\git.exe -C data/worlds
 ::Make a .git folder
-call PortableGit\bin\git.exe init
+call PortableGit\bin\git.exe -C data/worlds init
 ::Add the SMAS++ repo to the .git list
-call PortableGit\bin\git.exe remote add origin https://github.com/SpencerEverly/smasplusplus.git
+call PortableGit\bin\git.exe -C data/worlds remote add origin https://github.com/SpencerEverly/smasplusplus.git
 ::The set stuff improves the connection when downloading the repo
 set GIT_TRACE_PACKET=1
 set GIT_TRACE=1
 set GIT_CURL_VERBOSE=1
 ::Downloads the specific branch from the repo that is stored
-call PortableGit\bin\git.exe pull origin main
-::Finally, reset back to the default folder
-call PortableGit\bin\git.exe -C ../..
+call PortableGit\bin\git.exe -C data/worlds pull origin main
 ::After downloading, there's a weird world map corruption issue when downloading from GitHub. Make sure to extract the .7z automatically from both worlds to prevent crashes and errors.
+cd data
+cd worlds
 cd "Super Mario All-Stars++"
 __7zip\7zG.exe x "__World Map.7z" -aoa
 cd..
