@@ -1,4 +1,4 @@
-::Super Mario All-Stars++ Updater
+::Super Mario All-Stars++ Updater (v1.5.1)
 ::By Spencer Everly
 ::Hi there, thanks for analyzing this code. It's... not the best, but it gets the job done.
 ::Comments will be around this code to explain what each does for easier readability.
@@ -12,7 +12,7 @@ setlocal enableDelayedExpansion
 set /a size=80-1 & rem screen size minus one
 
 ::With that out of the way, we can start
-title Super Mario All-Stars++ Updater ^(v1.5.0^)
+title Super Mario All-Stars++ Updater ^(v1.5.1^)
 echo Starting updater...
 ::This makes sure we go into the root of the .bat, preventing errors
 pushd "%~dp0"
@@ -35,11 +35,10 @@ if not exist smassav_backup ( mkdir smassav_backup )
 :start
 cls
 echo Super Mario All-Stars^+^+ Downloader^/Updater
-echo v1.5.0
+echo v1.5.1
 echo.
-echo Make SURE this .bat is in the SMBX2 folder^, and the ^"PortableGit^"
-echo folder is in the worlds folder ^(Located under data^/worlds^, or
-echo just worlds^) before downloading^/updating^^!^^!^^!^^!^^!
+echo Make SURE this .bat ^(And PortableGit^) is in the SMBX2 folder
+echo before downloading^/updating^^!^^!^^!^^!^^!
 echo.
 echo Press 1 and enter to download^/update Super Mario All^-Stars^+^+.
 echo Press 2 and enter for some settings.
@@ -73,7 +72,7 @@ if '%choice%'=='2' goto clearsmasandgit
 if '%choice%'=='3' goto movesavestosmas
 if '%choice%'=='4' goto start
 echo "%choice%" is not valid, try again.
-goto start
+goto settingsmenu
 
 :movesavestosmas
 cls
