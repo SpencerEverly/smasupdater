@@ -1,4 +1,4 @@
-::Super Mario All-Stars++ Updater (v1.5.1)
+::Super Mario All-Stars++ Updater (v1.6.0)
 ::By Spencer Everly
 ::Hi there, thanks for analyzing this code. It's... not the best, but it gets the job done.
 ::Comments will be around this code to explain what each does for easier readability.
@@ -12,7 +12,7 @@ setlocal enableDelayedExpansion
 set /a size=80-1 & rem screen size minus one
 
 ::With that out of the way, we can start
-title Super Mario All-Stars++ Updater ^(v1.5.1^)
+title Super Mario All-Stars++ Updater ^(v1.6.0^)
 echo Starting updater...
 ::This makes sure we go into the root of the .bat, preventing errors
 pushd "%~dp0"
@@ -30,6 +30,7 @@ if /i !ERRORLEVEL!==0 (
 )
 
 if not exist smassav_backup ( mkdir smassav_backup )
+if not exist "%cd%\data\worlds\Super Mario All-Stars++" (mkdir "%cd%\data\worlds\Super Mario All-Stars++" )
 
 ::We then start the menu.
 :start
@@ -62,16 +63,29 @@ echo downloading issues, or anything else at all.
 echo.
 echo Press 1 and enter to refresh SMAS^+^+ ^(Saves will be kept^).
 echo Press 2 and enter to delete SMAS^+^+ for redownloading ^(Saves will be kept^).
-echo Press 3 and enter to move any backup saves back to SMAS^+^+.
-echo Press 4 and enter to return back to the main menu.
+echo Press 3 and enter to copy saves to backup from SMAS^+^+.
+echo Press 4 and enter to move backup saves back to SMAS^+^+.
+echo Press 5 and enter to return back to the main menu.
 set choice=
 set /p choice=
 if not '%choice%'=='' set choice=%choice:~0,1%
 if '%choice%'=='1' goto clearsmas
 if '%choice%'=='2' goto clearsmasandgit
-if '%choice%'=='3' goto movesavestosmas
-if '%choice%'=='4' goto start
+if '%choice%'=='3' goto copysavesfromsmas
+if '%choice%'=='4' goto movesavestosmas
+if '%choice%'=='5' goto start
 echo "%choice%" is not valid, try again.
+goto settingsmenu
+
+:copysavesfromsmas
+cls
+echo Backing up saves...
+@timeout 0 /nobreak>nul
+if not exist "%cd%\data\worlds\Super Mario All-Stars++\save1.sav" then goto nosavesfound
+copy /y "%cd%\data\worlds\Super Mario All-Stars++\*.sav" "%cd%\smassav_backup"
+copy /y "%cd%\data\worlds\Super Mario All-Stars++\*-ext.dat" "%cd%\smassav_backup"
+echo Done^^! Returning to the menu in 5 seconds...
+@timeout 5 /nobreak>nul
 goto settingsmenu
 
 :movesavestosmas
@@ -95,6 +109,7 @@ move /y "%cd%\data\worlds\Super Mario All-Stars++\*-ext.dat" "%cd%\smassav_backu
 echo Refreshing game for regeneration...
 @timeout 0 /nobreak>nul
 call Recycle.exe "data/worlds/Super Mario All-Stars++"
+mkdir "%cd%\data\worlds\Super Mario All-Stars++"
 @timeout 0 /nobreak>nul
 echo Done^^! Returning to the menu in 5 seconds... ^(You should find your saves in the
 echo ^"smassav_backup^" folder.^)
@@ -111,8 +126,7 @@ move /y "%cd%\data\worlds\Super Mario All-Stars++\*.sav" "%cd%\smassav_backup"
 move /y "%cd%\data\worlds\Super Mario All-Stars++\*-ext.dat" "%cd%\smassav_backup"
 echo Restarting state for redownloading...
 @timeout 0 /nobreak>nul
-call Recycle.exe "data/worlds/Super Mario All-Stars++"
-call Recycle.exe "data/worlds/.git"
+call Recycle.exe "data/worlds/Super Mario All-Stars++/.git"
 @timeout 0 /nobreak>nul
 echo Done^^! Returning to the menu in 5 seconds... ^(You should find your saves in the
 echo ^"smassav_backup^" folder.^)
@@ -139,15 +153,15 @@ cd ../..
 ::Now we start updating the episode if .git wasn't found.
 echo Pulling the latest update from GitHub...
 ::This reads the .git for the repository that's saved
-call PortableGit\bin\git.exe -C data/worlds fetch --all
+call PortableGit\bin\git.exe -C "data/worlds/Super Mario All-Stars++" fetch --all
 ::This resets to download a different branch if so
-call PortableGit\bin\git.exe -C data/worlds reset --hard
+call PortableGit\bin\git.exe -C "data/worlds/Super Mario All-Stars++" reset --hard
 ::The set stuff improves the connection when downloading the repo
 set GIT_TRACE_PACKET=1
 set GIT_TRACE=1
 set GIT_CURL_VERBOSE=1
 ::Downloads the specific branch from the repo that is stored
-call PortableGit\bin\git.exe -C data/worlds pull origin main
+call PortableGit\bin\git.exe -C "data/worlds/Super Mario All-Stars++" pull origin main
 ::After downloading, there's a weird world map corruption issue when downloading from GitHub. Make sure to extract the .7z automatically from both worlds to prevent crashes and errors.
 cd data
 cd worlds
@@ -164,15 +178,15 @@ cd ../..
 ::Ping the Internet to start a connection
 PING -n 5 127.0.0.1>nul
 ::Make a .git folder
-call PortableGit\bin\git.exe -C data/worlds init
+call PortableGit\bin\git.exe -C "data/worlds/Super Mario All-Stars++" init
 ::Add the SMAS++ repo to the .git list
-call PortableGit\bin\git.exe -C data/worlds remote add origin https://github.com/SpencerEverly/smasplusplus.git
+call PortableGit\bin\git.exe -C "data/worlds/Super Mario All-Stars++" remote add origin https://github.com/SpencerEverly/smasplusplus.git
 ::The set stuff improves the connection when downloading the repo
 set GIT_TRACE_PACKET=1
 set GIT_TRACE=1
 set GIT_CURL_VERBOSE=1
 ::Downloads the specific branch from the repo that is stored
-call PortableGit\bin\git.exe -C data/worlds pull origin main
+call PortableGit\bin\git.exe -C "data/worlds/Super Mario All-Stars++" pull origin main
 ::After downloading, there's a weird world map corruption issue when downloading from GitHub. Make sure to extract the .7z automatically from both worlds to prevent crashes and errors.
 cd data
 cd worlds
@@ -185,6 +199,7 @@ cd..
 goto updatecomplete
 
 :updatecomplete
+echo.
 echo Download complete. Check above to see if there are any errors. If any,
 echo you can correct them by doing what is above.
 echo.
